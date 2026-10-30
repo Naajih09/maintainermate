@@ -76,4 +76,4 @@ function parseJson(text) {
   throw new Error(`Gemma did not return JSON:\n${text.slice(0, 2000)}`);
 }
 
-module.exports = { askGemma };
+if (typeof module !== "undefined") module.exports = { askGemma };

@@ -132,4 +132,4 @@ function scan(files) {
   return flags;
 }
 
-module.exports = { scan };
+if (typeof module !== "undefined") module.exports = { scan };
