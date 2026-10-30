@@ -2,7 +2,7 @@
 
 **Gemma-powered triage that exorcises ghost PRs from your repo.**
 
-Every October, open-source repos get haunted. Pull requests appear out of nowhere: a stray space in the README, a "naajih was here" line, a typo fix that isn't a typo. These are **ghost PRs**, contributions with no real substance, and maintainers spend hours dealing with them instead of reviewing real work.
+Every Hacktoberfest  , maintainers get flooded with pull requests, and many of them are low-effort or spam. MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
 
 MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
 
@@ -82,3 +82,7 @@ The workflow uses `pull_request_target` so it can comment on PRs from forks. Tha
 ## License
 
 MIT
+
+
+## Contributors
+- naajih was here
