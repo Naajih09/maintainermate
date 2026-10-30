@@ -14,7 +14,7 @@ inputs:
   model:
     description: "Gemma model name"
     required: false
-    default: "gemma-3-27b-it"
+    default: "gemma-4-26b-a4b-it"
   labels:
     description: "Comma-separated labels Gemma may choose from"
     required: false

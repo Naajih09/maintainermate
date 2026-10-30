@@ -4,15 +4,25 @@
 
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
+const RETRIES = 4;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function askGemma(prompt, { apiKey, model }) {
-  const res = await fetch(`${API_BASE}/${model}:generateContent?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 1500 },
-    }),
-  });
+  let res;
+  for (let attempt = 1; attempt <= RETRIES; attempt++) {
+    res = await fetch(`${API_BASE}/${model}:generateContent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2, maxOutputTokens: 1500 },
+      }),
+    });
+    // Retry on rate limits and transient server errors, with exponential backoff.
+    if (res.ok || ![429, 500, 503].includes(res.status) || attempt === RETRIES) break;
+    console.log(`Gemma returned ${res.status}, retrying (${attempt}/${RETRIES - 1})...`);
+    await sleep(2000 * 2 ** (attempt - 1));
+  }
   if (!res.ok) {
     throw new Error(`Gemma API error ${res.status}: ${await res.text()}`);
   }

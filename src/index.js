@@ -23,7 +23,7 @@ async function main() {
     repo,
     number,
     kind,
-    gemma: { apiKey: input("gemma-api-key"), model: input("model", "gemma-3-27b-it") },
+    gemma: { apiKey: input("gemma-api-key"), model: input("model", "gemma-4-26b-a4b-it") },
     labels: input("labels", "bug,enhancement,documentation,question,tests,refactor,dependencies")
       .split(",")
       .map((l) => l.trim())

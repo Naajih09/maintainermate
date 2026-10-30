@@ -23,7 +23,7 @@ triage({
   repo,
   number: Number(number),
   kind,
-  gemma: { apiKey: process.env.GEMMA_API_KEY, model: process.env.GEMMA_MODEL || "gemma-3-27b-it" },
+  gemma: { apiKey: process.env.GEMMA_API_KEY, model: process.env.GEMMA_MODEL || "gemma-4-26b-a4b-it" },
   labels: ["bug", "enhancement", "documentation", "question", "tests", "refactor", "dependencies"],
   spamThreshold: 70,
   dryRun: !post,

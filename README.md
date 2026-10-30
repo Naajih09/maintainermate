@@ -46,7 +46,7 @@ jobs:
 | Input | Default | Description |
 |---|---|---|
 | `gemma-api-key` | (required) | Google AI Studio key |
-| `model` | `gemma-3-27b-it` | Any Gemma model on the Gemini API |
+| `model` | `gemma-4-26b-a4b-it` | Any Gemma model on the Gemini API |
 | `labels` | `bug,enhancement,documentation,question,tests,refactor,dependencies` | Labels Gemma may choose from |
 | `spam-threshold` | `70` | Score at or above which `spam-suspected` is added |
 
