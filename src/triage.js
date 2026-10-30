@@ -62,9 +62,9 @@ ${issue.body || "(no description)"}`;
 }
 
 function spamBadge(score) {
-  if (score >= 70) return `🚩 **Likely spam / low-effort** (${score}/100)`;
-  if (score >= 40) return `⚠️ **Possibly low-effort** (${score}/100)`;
-  return `✅ **Looks genuine** (${score}/100)`;
+  if (score >= 70) return `👻 **Ghost PR detected:** likely spam / low-effort (${score}/100)`;
+  if (score >= 40) return `🕯️ **Something feels off:** possibly low-effort (${score}/100)`;
+  return `✅ **A living, breathing contribution:** looks genuine (${score}/100)`;
 }
 
 const list = (items) => (items?.length ? items.map((i) => `- ${i}`).join("\n") : "_None_");

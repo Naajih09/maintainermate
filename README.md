@@ -1,16 +1,25 @@
-# 🤖 MaintainerMate
+# 👻 MaintainerMate
 
-**Gemma-powered triage for open-source maintainers.**
+**Gemma-powered triage that exorcises ghost PRs from your repo.**
 
-Every Hacktoberfest, maintainers get flooded with pull requests, and many of them are low-effort or spam. MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
+Every October, open-source repos get haunted. Pull requests appear out of nowhere: a stray space in the README, a "naajih was here" line, a typo fix that isn't a typo. These are **ghost PRs**, contributions with no real substance, and maintainers spend hours dealing with them instead of reviewing real work.
 
-- 🚩 **Scores spam and low-effort PRs** (whitespace-only changes, typo farming, "add my name" PRs)
+MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
+
+- 👻 **Detects ghost PRs** and scores spam and low-effort changes (whitespace-only edits, typo farming, "add my name" PRs)
 - 🏷️ **Suggests labels** from *your* label list
 - 📝 **Summarizes the change** in plain English
 - ✅ **Writes a review checklist** and flags risky changes
 - 🌱 **Spots good first issues** and rewrites vague issues as clear, step-by-step tasks
 
 It posts one comment per PR or issue and updates it on later runs, so it doesn't clutter the thread.
+
+## See it in action
+
+| Example | Result |
+|---|---|
+| [PR #2](https://github.com/Naajih09/maintainermate/pull/2): adds "naajih was here" plus a stray space | 👻 Ghost PR detected (98/100), labelled `spam-suspected` |
+| [Issue #1](https://github.com/Naajih09/maintainermate/issues/1): a real feature request | ✅ Genuine (0/100), labelled `enhancement` and `good first issue`, rewritten as a 5-step task |
 
 ## Why Gemma?
 
