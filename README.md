@@ -2,7 +2,7 @@
 
 **Gemma-powered triage for open-source maintainers.**
 
-Every Hacktoberfest, maintainers get flooded with pull requests, and many of them are low-effort or spam. MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
+Every Hacktoberfest  , maintainers get flooded with pull requests, and many of them are low-effort or spam. MaintainerMate is a GitHub Action that reads each new PR and issue with Google's open-weight **Gemma** model, then:
 
 - 🚩 **Scores spam and low-effort PRs** (whitespace-only changes, typo farming, "add my name" PRs)
 - 🏷️ **Suggests labels** from *your* label list
@@ -73,3 +73,7 @@ The workflow uses `pull_request_target` so it can comment on PRs from forks. Tha
 ## License
 
 MIT
+
+
+## Contributors
+- naajih was here
