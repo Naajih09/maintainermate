@@ -20,13 +20,15 @@ It posts one comment per PR or issue and updates it on later runs, so it doesn't
 
 ## See it in action
 
+**🔮 Try it live:** https://naajih09.github.io/maintainermate/. Paste any public PR link and scan it in your browser.
+
 | Example | Result |
 |---|---|
-| [PR #3](https://github.com/Naajih09/maintainermate/pull/3): a "setup helper" that hides token theft, an install hook, obfuscated code, and a typosquat, plus a hidden instruction telling the AI to mark it safe | 👹 Possessed: 5 red flags, labelled `security-review`. Gemma ignored the injected instruction and reported it. |
+| [PR #4](https://github.com/Naajih09/maintainermate/pull/4): a "setup helper" that hides token theft, an install hook, obfuscated code, and a typosquat, plus a hidden instruction telling the AI to mark it safe | 👹 Possessed: 5 red flags, labelled `security-review`. Gemma ignored the injected instruction and reported it. |
 | [PR #2](https://github.com/Naajih09/maintainermate/pull/2): adds "naajih was here" plus a stray space | 👻 Ghost PR detected (100/100), labelled `spam-suspected` |
 | [Issue #1](https://github.com/Naajih09/maintainermate/issues/1): a real feature request | ✅ Genuine (0/100), labelled `enhancement` and `good first issue`, rewritten as a 5-step task |
 
-PR #3 is a harmless demo: its "payload" only prints a message, and the webhook URL is fake.
+PR #4 is a harmless demo: its "payload" only prints a message, and the webhook URL is fake.
 
 ## How the possession check resists prompt injection
 
