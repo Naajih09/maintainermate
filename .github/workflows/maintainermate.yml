@@ -1,0 +1,22 @@
+name: MaintainerMate
+
+on:
+  # pull_request_target lets the action comment on PRs from forks.
+  # It is safe here because we never check out or run the PR's code,
+  # we only read the diff through the GitHub API.
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Naajih09/maintainermate@main
+        with:
+          gemma-api-key: ${{ secrets.GEMMA_API_KEY }}

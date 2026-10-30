@@ -1,0 +1,28 @@
+name: "MaintainerMate"
+description: "Gemma-powered triage for pull requests and issues: spam detection, labels, summaries, and good-first-issue spotting."
+branding:
+  icon: "shield"
+  color: "orange"
+inputs:
+  gemma-api-key:
+    description: "Google AI Studio API key used to call Gemma"
+    required: true
+  github-token:
+    description: "Token used to comment and label"
+    required: false
+    default: ${{ github.token }}
+  model:
+    description: "Gemma model name"
+    required: false
+    default: "gemma-3-27b-it"
+  labels:
+    description: "Comma-separated labels Gemma may choose from"
+    required: false
+    default: "bug,enhancement,documentation,question,tests,refactor,dependencies"
+  spam-threshold:
+    description: "Spam score (0-100) at or above which the spam-suspected label is added"
+    required: false
+    default: "70"
+runs:
+  using: "node20"
+  main: "src/index.js"
