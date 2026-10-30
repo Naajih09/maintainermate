@@ -112,7 +112,7 @@ function prComment(r, flags) {
 **Summary:** ${r.summary}
 
 ${possessionSection(r, flags)}
-**Spam check:** ${spamBadge(r.spam_score)} — ${r.spam_reason}
+**Spam check:** ${["medium", "high"].includes(r.threat_level) ? "_Skipped: a security threat matters more than effort. See the possession check above._" : `${spamBadge(r.spam_score)} — ${r.spam_reason}`}
 
 **Suggested labels:** ${r.labels.map((l) => `\`${l}\``).join(" ") || "_none_"}
 
