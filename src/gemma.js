@@ -32,14 +32,21 @@ async function askGemma(prompt, { apiKey, model }) {
 }
 
 function parseJson(text) {
-  // Strip markdown fences and grab the outermost {...} block.
-  const cleaned = text.replace(/```(?:json)?/g, "");
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start === -1 || end === -1) {
-    throw new Error(`Gemma did not return JSON:\n${text}`);
+  // Find the first balanced {...} block, ignoring braces inside strings,
+  // so extra text or a second object after the JSON doesn't break parsing.
+  const start = text.indexOf("{");
+  let depth = 0;
+  let inString = false;
+  for (let i = start; start !== -1 && i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (ch === "\\") i++;
+      else if (ch === '"') inString = false;
+    } else if (ch === '"') inString = true;
+    else if (ch === "{") depth++;
+    else if (ch === "}" && --depth === 0) return JSON.parse(text.slice(start, i + 1));
   }
-  return JSON.parse(cleaned.slice(start, end + 1));
+  throw new Error(`Gemma did not return JSON:\n${text}`);
 }
 
 module.exports = { askGemma };
