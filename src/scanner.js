@@ -1,5 +1,6 @@
 // Deterministic malware red-flag scanner. Runs before Gemma and doesn't depend on it,
 // so a PR that tricks the model with hidden instructions still gets flagged.
+// This is a heuristic scanner: it catches common attack patterns, not every malicious PR.
 
 const RULES = [
   {
@@ -61,7 +62,7 @@ const POPULAR = [
   "webpack", "typescript", "dotenv", "jsonwebtoken", "mongoose", "socket.io", "next",
   "requests", "numpy", "pandas", "flask", "django", "urllib3", "setuptools", "colorama",
   "beautifulsoup4", "cryptography", "boto3", "pillow", "selenium",
-];
+].map((p) => p.toLowerCase());
 
 function editDistance(a, b) {
   const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
@@ -78,20 +79,31 @@ function editDistance(a, b) {
   return dp[a.length][b.length];
 }
 
+// Matches npm entries with any version spec (semver, "latest", "*", git or github sources),
+// and Python requirements lines.
 function findTyposquat(line, filename) {
   let name;
-  if (/(^|\/)package\.json$/.test(filename)) name = line.match(/^\s*"([@\w./-]+)"\s*:\s*"[\^~]?\d/)?.[1];
-  else if (/requirements.*\.txt$/.test(filename)) name = line.match(/^\s*([\w.-]+)\s*(==|>=|~=|$)/)?.[1];
+  if (/(^|\/)package\.json$/.test(filename)) {
+    name = line.match(/^\s*"([@\w./-]+)"\s*:\s*"[^"]*"/)?.[1];
+  } else if (/requirements.*\.txt$/.test(filename)) {
+    name = line.match(/^\s*([\w.-]+)\s*(==|>=|~=|$)/)?.[1];
+  }
   if (!name) return null;
   name = name.toLowerCase();
-  const target = POPULAR.find((p) => p !== name && editDistance(p, name) === 1);
+  // Skip exact matches to popular names and names far from them in length.
+  if (POPULAR.includes(name)) return null;
+  const target = POPULAR.find(
+    (p) => Math.abs(p.length - name.length) <= 1 && editDistance(p, name) === 1,
+  );
   return target ? { name, target } : null;
 }
 
 // Yields [lineNumber, text] for each added line in a unified diff patch.
+// "\ No newline at end of file" markers don't advance the line counter.
 function* addedLines(patch) {
   let lineNo = 0;
   for (const raw of patch.split("\n")) {
+    if (raw.startsWith("\\")) continue;
     const hunk = raw.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
     if (hunk) {
       lineNo = Number(hunk[1]);
@@ -102,15 +114,46 @@ function* addedLines(patch) {
   }
 }
 
+// Cleans text before it goes into a comment or prompt: no newlines, no tag-like content.
+function cleanSnippet(text) {
+  return text
+    .replace(/[\r\n]+/g, " ")
+    .replace(/<\/?untrusted>/gi, "[tag removed]")
+    .trim()
+    .slice(0, 120);
+}
+
+// Returns flags for files the scanner could not read. These count as unreviewed,
+// so the caller should raise the threat level when any appear.
+function unscannedFlags(files) {
+  return files
+    .filter((f) => !f.patch && f.status !== "removed")
+    .map((f) => ({
+      rule: "unscanned",
+      severity: "medium",
+      title: "File could not be scanned (no diff available, possibly binary or too large)",
+      file: f.filename,
+      line: 0,
+      snippet: `status: ${f.status}, +${f.additions ?? 0}/-${f.deletions ?? 0}`,
+    }));
+}
+
 function scan(files) {
-  const flags = [];
+  const flags = [...unscannedFlags(files)];
   for (const f of files) {
     if (!f.patch) continue;
     for (const rule of RULES) {
       if (rule.files && !rule.files.test(f.filename)) continue;
       for (const [line, text] of addedLines(f.patch)) {
         if (rule.pattern.test(text)) {
-          flags.push({ rule: rule.id, severity: rule.severity, title: rule.title, file: f.filename, line, snippet: text.trim().slice(0, 120) });
+          flags.push({
+            rule: rule.id,
+            severity: rule.severity,
+            title: rule.title,
+            file: f.filename,
+            line,
+            snippet: cleanSnippet(text),
+          });
           if (rule.once) break;
         }
       }
@@ -124,7 +167,7 @@ function scan(files) {
           title: `Dependency "${hit.name}" looks like a typosquat of "${hit.target}"`,
           file: f.filename,
           line,
-          snippet: text.trim().slice(0, 120),
+          snippet: cleanSnippet(text),
         });
       }
     }
