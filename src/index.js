@@ -8,21 +8,47 @@ const { triage } = require("./triage");
 const input = (name, fallback = "") =>
   (process.env[`INPUT_${name.replace(/[ -]/g, "_").toUpperCase()}`] || fallback).trim();
 
+// The default GITHUB_TOKEN can't call /user, so fall back to the bot identity it posts as.
+async function resolveBotLogin(gh) {
+  try {
+    return await gh.getViewer();
+  } catch {
+    return "github-actions[bot]";
+  }
+}
+
 async function main() {
   const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
   const repo = process.env.GITHUB_REPOSITORY;
 
-  const kind = event.pull_request ? "pull" : event.issue ? "issue" : null;
+  // A comment on a pull request arrives as an issue event with issue.pull_request set.
+  let kind = null;
+  let number = null;
+  if (event.pull_request) {
+    kind = "pull";
+    number = event.pull_request.number;
+  } else if (event.issue?.pull_request) {
+    kind = "pull";
+    number = event.issue.number;
+  } else if (event.issue) {
+    kind = "issue";
+    number = event.issue.number;
+  }
   if (!kind) {
     console.log("Not a pull request or issue event; nothing to do.");
     return;
   }
-  const number = (event.pull_request ?? event.issue).number;
 
-  // Fall back to the token GitHub provides to every action run.
-  const token = input("github-token") || process.env.GITHUB_TOKEN;
+  const token = input("github-token");
   if (!token) {
-    throw new Error("No GitHub token available. Pass github-token or enable GITHUB_TOKEN.");
+    throw new Error("Missing github-token. Add `github-token: ${{ secrets.GITHUB_TOKEN }}` to your workflow.");
+  }
+  const gh = client(token);
+  const botLogin = await resolveBotLogin(gh);
+
+  const gemmaApiKey = input("gemma-api-key");
+  if (!gemmaApiKey) {
+    throw new Error("Missing required input: gemma-api-key");
   }
 
   // Clamp to 0-100 and fall back to 70 if the value isn't a number.
@@ -31,13 +57,8 @@ async function main() {
     ? Math.min(100, Math.max(0, parsedThreshold))
     : 70;
 
-  const gemmaApiKey = input("gemma-api-key");
-  if (!gemmaApiKey) {
-    throw new Error("Missing required input: gemma-api-key");
-  }
-
   await triage({
-    gh: client(token),
+    gh,
     repo,
     number,
     kind,
@@ -48,6 +69,7 @@ async function main() {
       .filter(Boolean),
     spamThreshold,
     dryRun: false,
+    botLogin,
   });
 }
 
