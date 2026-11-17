@@ -1,4 +1,5 @@
 name: "MaintainerMate"
+author: "Naajih Siraj"
 description: "Gemma-powered triage for pull requests and issues: spam detection, labels, summaries, and good-first-issue spotting."
 branding:
   icon: "shield"
@@ -8,9 +9,8 @@ inputs:
     description: "Google AI Studio API key used to call Gemma"
     required: true
   github-token:
-    description: "Token used to comment and label"
-    required: false
-    default: ${{ github.token }}
+    description: "Token used to comment and label. Pass secrets.GITHUB_TOKEN, or a personal token to post as yourself."
+    required: true
   model:
     description: "Gemma model name"
     required: false
@@ -24,5 +24,5 @@ inputs:
     required: false
     default: "70"
 runs:
-  using: "node20"
+  using: "node24"
   main: "src/index.js"
